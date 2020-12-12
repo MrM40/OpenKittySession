@@ -9,9 +9,9 @@ How doest it work:
    
 2: Create a sessionfile containing only the session-specific properties.
    For now the only supported properties are:
-			UserName\xxx\
-			Password\xxx\
-			PublicKeyFile\xxx\
+	UserName\xxx\
+	Password\xxx\
+	PublicKeyFile\xxx\
 		
    This sessionfile should be called e.g. "SRV01.local.txt" (i.e. equal to hostname or optional IP address).
     
@@ -24,9 +24,3 @@ How doest it work:
    
 
 The tool is an AutoIt v3 compiled script, created with the AutoIt editor SciTe-Lite.
-
-
-
-      
-   
-
