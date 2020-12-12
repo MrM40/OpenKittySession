@@ -15,15 +15,15 @@ How doest it work:
 	Password\xxx\
 	PublicKeyFile\xxx\
 		
-   This sessionfile should be called e.g. "SRV01.local.txt" (i.e. equal to hostname or optional IP address).
+   This sessionfile should be called e.g. `SRV01.local.txt` (i.e. equal to hostname or optional IP address).
     
-3: Modify the StartKittySession.ini:
-   The "SessionFld" property is a folderpath to where "CommonSessionSettings.txt" and "SRV01.local" are located.
-   E.g. "SessionFld=Y:\KittySessions\"
+3: Modify the `StartKittySession.ini`:
+   The `SessionFld` property is a folderpath to where `CommonSessionSettings.txt` and `SRV01.local` are located.
+   E.g. `SessionFld=Y:\KittySessions\`
    
-4: To call the session use "StartKittySession.exe SRV01.local"
-   StartKittySession.exe and StartKittySession.ini must be located in the same folder.
+4: To call the session use `StartKittySession.exe SRV01.local`
+   `StartKittySession.exe` and `StartKittySession.ini` must be located in the same folder.
    
 
 The tool is an AutoIt v3 compiled script, created with the AutoIt editor SciTe-Lite.
-_
+
