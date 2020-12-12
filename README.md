@@ -24,3 +24,4 @@ How doest it work:
    
 
 The tool is an AutoIt v3 compiled script, created with the AutoIt editor SciTe-Lite.
+_
