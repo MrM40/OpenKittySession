@@ -9,11 +9,11 @@ How doest it work:
    
 2: Create a sessionfile containing only the session-specific properties.
    For now the only supported properties are:
-      UserName\xxx\
-      Password\xxx\
-      PublicKeyFile\xxx\
-      
-    This sessionfile should be called e.g. "SRV01.local.txt" (i.e. equal to hostname or optional IP address).
+		UserName\xxx\
+		Password\xxx\
+		PublicKeyFile\xxx\
+		
+   This sessionfile should be called e.g. "SRV01.local.txt" (i.e. equal to hostname or optional IP address).
     
 3: Modify the StartKittySession.ini:
    The "SessionFld" property is a folderpath to where "CommonSessionSettings.txt" and "SRV01.local" are located.
