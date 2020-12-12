@@ -3,12 +3,14 @@ Make it possible to share a template-session-file, with common session propertie
 Additionally set size and location of the Kitty terminal window.
 
 How doest it work:
+
 1: Create a template session-file which include common-properties, which will be shared by all sessions.
    This will typically just be a copy of Default%20Settings.ktx, which is created by kitty.
    Call this templatefile "CommonSessionSettings.txt"
    
 2: Create a sessionfile containing only the session-specific properties.
    For now the only supported properties are:
+   
 	UserName\xxx\
 	Password\xxx\
 	PublicKeyFile\xxx\
