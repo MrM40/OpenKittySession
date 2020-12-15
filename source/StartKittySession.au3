@@ -2,12 +2,11 @@
 
 ; SET VARIABLES:
    Const $SessionName = $CmdLine[1] ;SessionName must be equal to Hostname!
-   Global $HostName, $Username, $Password, $PublicKeyFile ;Session-specific properties
-   Global $SessionFld, $Kitty, $WinTitle, $PosX, $PosY, $SizeX, $SizeY
+   Global $SessionFld, $Kitty, $WinTitle, $PosX, $PosY, $SizeX, $SizeY, $SessionSpecificProperties
 
-   ReadINI()
+ReadINI()
 
-   Const $CommonSessionSettingsPath = $SessionFld & "CommonSessionSettings.txt" ;Hold the common session properties which are shared by all sessions
+   Const $CommonSessionSettingsPath = $SessionFld & "~CommonSessionSettings.txt" ;Hold the common session properties which are shared by all sessions
    Const $SessionFilePath = $SessionFld & $SessionName & ".txt" ;File containing the session-specific properties
    Const $TmpSessionFilePath = EnvGet("TEMP") & "\KittySession.ktx" ; The temporary sessionfile used by kitte.exe
 
@@ -17,14 +16,14 @@
    CallKitty()
    SetWindowsPossition()
    Sleep(1000)
-   FileDelete($TmpSessionFilePath)
+   ;FileDelete($TmpSessionFilePath)
 
    ;Get variables fron ini-file
    Func ReadINI()
 	  Local $INIFileObj = FileOpen("StartKittySession.ini", 0)
 
 	  $SessionFld = StringReplace(FileReadLine($INIFileObj, 1),"SessionFld=","")
-	  ;MsgBox(0,"$SessionFld",$SessionFld)
+	  ;MsgBox(0.,"$SessionFld",$SessionFld)
 
 	  $Kitty=StringReplace(FileReadLine($INIFileObj, 2),"Kitty=","")
 	  ;MsgBox(0,"$Kitty",$Kitty)
@@ -44,29 +43,36 @@
 
    ;Set session-specific properties from the ession-file (i.e. $Username, $Password and $PublicKeyFile):
    Func SetSessionSpecificProperties()
+	  ;Get all lines from the file containing session-specific-properties ($SessionSpecificProperties):
 	  Local $SessionFileObj = FileOpen($SessionFilePath, 0) ;Read mode
-	  ;MsgBox(0,"$SessionFilePath",$SessionFilePath)
-	  $Username = FileReadLine($SessionFileObj,1)
-	  $Password = FileReadLine($SessionFileObj,2)
-	  $PublicKeyFile = FileReadLine($SessionFileObj,3)
-	  $HostName = "HostName\" & $SessionName & "\"
+	  $SessionSpecificProperties = FileReadToArray($SessionFileObj)
 	  FileClose($SessionFileObj)
-	  ;MsgBox(0,"$Username",$Username)
    EndFunc
 
    ;Create temporary-session-file:
    Func ConstructTmpSessionFile()
-	  ;Just make a copy of the template-file:
-	  FileCopy($CommonSessionSettingsPath, $TmpSessionFilePath,1) ;1=Owerwrite
-	  ;MsgBox(0,"$CommonSessionSettingsPath",$CommonSessionSettingsPath)
-	  Local $TmpSessionFileObj = FileOpen($TmpSessionFilePath, 1) ;Write mode (append to end of file)
+	  Local $WriteLine = True
 
-	  ;Write the session-specific properties to the temporary-session-file:
-	  FileWriteLine($TmpSessionFileObj,"") ;In case last character in targetfile is not linefeed
-	  FileWriteLine($TmpSessionFileObj,$HostName)
-	  FileWriteLine($TmpSessionFileObj,$Username)
-	  FileWriteLine($TmpSessionFileObj,$Password)
-	  FileWriteLine($TmpSessionFileObj,$PublicKeyFile)
+	  ;Crate new empty session-file in %temp%:
+	  Local $TmpSessionFileObj = FileOpen($TmpSessionFilePath, 2) ;Write mode (erase previous contents)
+
+	  ;Read all lines from file containing common session settings ($CommonSessionSettingsPath):
+	  Local $CommonSessionSettingsObj = FileOpen($CommonSessionSettingsPath, 0) ;read-mode
+	  Local $CommonSettings = FileReadToArray($CommonSessionSettingsObj)
+
+	  ;Iterate all common settings and compare with session-specific settings.
+	  For $CommonLine in $CommonSettings
+		 $WriteLine = True
+		 For $NewSetting in $SessionSpecificProperties
+			If StringSplit($CommonLine,"\")[1] == StringSplit($NewSetting,"\")[1] then $WriteLine = False
+		 Next
+		 If $WriteLine = True then FileWriteLine($TmpSessionFileObj,$CommonLine)
+	  Next
+
+	  For $Line in $SessionSpecificProperties
+		 FileWriteLine($TmpSessionFileObj,$Line)
+	  Next
+
 	  FileClose($TmpSessionFileObj)
    EndFunc
 
