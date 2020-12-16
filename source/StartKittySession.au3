@@ -1,8 +1,10 @@
+#include <Array.au3>
 ;Argument 1: Session-name, which must be equeal to hostname!
 
 ; SET VARIABLES:
+
    Const $SessionName = $CmdLine[1] ;SessionName must be equal to Hostname!
-   Global $SessionFld, $Kitty, $WinTitle, $PosX, $PosY, $SizeX, $SizeY, $SessionSpecificProperties
+   Global $SessionFld, $Kitty, $WinTitle, $PosX, $PosY, $SizeX, $SizeY, $SessionSpecificProperties[1]
 
 ReadINI()
 
@@ -15,8 +17,6 @@ ReadINI()
    ConstructTmpSessionFile()
    CallKitty()
    SetWindowsPossition()
-   Sleep(1000)
-   ;FileDelete($TmpSessionFilePath)
 
    ;Get variables fron ini-file
    Func ReadINI()
@@ -43,10 +43,22 @@ ReadINI()
 
    ;Set session-specific properties from the ession-file (i.e. $Username, $Password and $PublicKeyFile):
    Func SetSessionSpecificProperties()
+	  ;Check if file exist:
+	  if FileExists($SessionFilePath) = False Then
+		 $SessionSpecificProperties[0] = "HostName\" & $SessionName & "\"
+		 Return
+	  EndIf
+
 	  ;Get all lines from the file containing session-specific-properties ($SessionSpecificProperties):
 	  Local $SessionFileObj = FileOpen($SessionFilePath, 0) ;Read mode
 	  $SessionSpecificProperties = FileReadToArray($SessionFileObj)
 	  FileClose($SessionFileObj)
+
+	  ReDim $SessionSpecificProperties[UBound($SessionSpecificProperties)]
+
+	  _ArrayAdd($SessionSpecificProperties,"HostName\" & $SessionName & "\")
+
+
    EndFunc
 
    ;Create temporary-session-file:
@@ -58,20 +70,30 @@ ReadINI()
 
 	  ;Read all lines from file containing common session settings ($CommonSessionSettingsPath):
 	  Local $CommonSessionSettingsObj = FileOpen($CommonSessionSettingsPath, 0) ;read-mode
+	  ;Load all lines from common-session-settings-file to array:
 	  Local $CommonSettings = FileReadToArray($CommonSessionSettingsObj)
 
-	  ;Iterate all common settings and compare with session-specific settings.
+	  ;Iterate all common-settings-array and compare with session-specific settings.
 	  For $CommonLine in $CommonSettings
 		 $WriteLine = True
+
 		 For $NewSetting in $SessionSpecificProperties
+			;if $NewSetting = "" then ContinueLoop
 			If StringSplit($CommonLine,"\")[1] == StringSplit($NewSetting,"\")[1] then $WriteLine = False
 		 Next
-		 If $WriteLine = True then FileWriteLine($TmpSessionFileObj,$CommonLine)
+
+		 ;Write if it doesn't exist in the session-specific-array
+		 If $WriteLine = True then
+			FileWriteLine($TmpSessionFileObj,$CommonLine)
+		 ;Else
+			;FileWriteLine($TmpSessionFileObj,$NewSetting)
+		 EndIf
 	  Next
 
-	  For $Line in $SessionSpecificProperties
-		 FileWriteLine($TmpSessionFileObj,$Line)
-	  Next
+;~ 	  ;Write all properties in the session-specific-array to the temp. session file:
+ 	  For $Line in $SessionSpecificProperties
+ 		 FileWriteLine($TmpSessionFileObj,$Line)
+ 	  Next
 
 	  FileClose($TmpSessionFileObj)
    EndFunc
@@ -91,3 +113,5 @@ ReadINI()
 	  WinWait($WinTitle,"",2)
 	  WinMove($WinTitle,"",$PosX,$PosY,$SizeX,$SizeY)
    EndFunc
+
+
